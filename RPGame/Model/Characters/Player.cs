@@ -39,6 +39,7 @@ namespace RPGame.Model.Characters
             while (charClass == "empty")
             {
                 Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("List of characters: ");
                 byte i = 0;
                 foreach (var className in charClassName)
@@ -46,6 +47,7 @@ namespace RPGame.Model.Characters
                     i++;
                     Console.WriteLine($"{i}. {className}");
                 }
+                Console.ResetColor();
                 Console.WriteLine();
                 Console.Write($"{name} select your character number: ");
                 string charClassNumber = Console.ReadLine();
@@ -86,7 +88,10 @@ namespace RPGame.Model.Characters
                         break;
                 }
             }
-            Console.WriteLine($"You selected {charClass}!");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"You selected {charClass}, great choise!");
+            Console.ResetColor();
             Invenory invenory = new Invenory();
             Player player = new Player(name, charClass, healthPoints, maxHealthPoints, strengthPoints, agilityPoints, invenory);
             return player;

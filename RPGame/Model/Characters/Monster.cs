@@ -86,6 +86,7 @@ namespace RPGame.Model.Characters
             }
             
             int n = 0;
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Select number of monster to fight:");
             foreach (Monster monster in nearbyMonsters)
             {
@@ -97,7 +98,7 @@ namespace RPGame.Model.Characters
                 Console.Write($"Agility: {monster.AgilityPoints} | ");
                 Console.WriteLine($"Reward: {monster.Coins}");
             }
-
+            Console.ResetColor();
             byte.TryParse(Console.ReadLine(), out byte monsterNumber);
 
             try

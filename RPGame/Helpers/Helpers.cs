@@ -42,7 +42,6 @@ namespace RPGame.Helpers
                 Console.WriteLine($"Current level is: {player.Level}");
                 Console.ResetColor();
             }
-//            if (player.Level > player.MaxLevel) player.Level = player.MaxLevel;
             player.MaxHealthPoints *= player.Level;
             player.StrengthPoints *= player.Level;
             return player;

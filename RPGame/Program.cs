@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Threading;
 using RPGame.Model.Characters;
 using RPGame.Helpers;
+using RPGame.Items;
 
 namespace RPGame
 {
@@ -16,10 +17,10 @@ namespace RPGame
             Console.WriteLine("Welcome to the console RPG!");
 
             // Create new player
-            //Console.WriteLine("Create new character.");
-            //Console.Write("Enter your name: ");
-            //string name = Console.ReadLine();
-            string name = "Jedi";
+            Console.WriteLine("Create new character.");
+            Console.Write("Enter your name: ");
+            string name = Console.ReadLine();
+            //string name = "Jedi";
             Player player = Player.CreatePlayer(name);
 
             while (true)
@@ -68,13 +69,13 @@ namespace RPGame
                     {
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"The {player.Name} - {player.CharClass} defeated all monsters and became the absolute winner, reaching {player.MaxLevel} level!");
+                        Console.WriteLine($"The {player.Name}-{player.CharClass} defeated all monsters and became the absolute winner, reaching {player.MaxLevel} level!");
                     }
                     else
                     {
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"The {player.Name} - {player.CharClass} fought bravely, but there were too many monsters!");
+                        Console.WriteLine($"The {player.Name}-{player.CharClass} fought bravely, but there were too many monsters!");
                     }
 
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -109,14 +110,15 @@ namespace RPGame
         }
         static void FightMonster(Player player)
         {
-            // Здесь вы можете реализовать механику боя с монстром
-            // Создайте монстра, определите условия победы и поражения и обновите состояние игрока.
-
             List<Monster> packOfMonsters = Monster.GenerateMonsterPack(player);
             Monster monster = Monster.Get5NearbyMonsters(packOfMonsters);
-            //int startPlayerHealthPoints = player.HealthPoints;
+
             Console.Clear();
-            Console.WriteLine($"Monstr {monster.Name} is coming to fight you!");
+            Console.Write("Monster ");
+            Console.ForegroundColor= ConsoleColor.Red;
+            Console.Write(monster.Name);
+            Console.ResetColor();
+            Console.WriteLine(" is coming to fight you!");
             bool winner = false;
             int i = 0;
             while (!winner)
@@ -125,23 +127,29 @@ namespace RPGame
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine($"\nRound {i}");
                 Console.ResetColor();
+                
+                // Player turn
                 monster.HealthPoints -= player.StrengthPoints;
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"The {player.Name} hits the {monster.Name} and deals {player.StrengthPoints} damage!");
+                Console.WriteLine($"The {player.Name}-{player.CharClass} hits the {monster.Name} and deals {player.StrengthPoints} damage!");
                 Console.ResetColor();
-                Console.WriteLine($"Monster HP is {monster.HealthPoints}");
+                Console.WriteLine($"Monster health: {monster.HealthPoints}");
+                
+                // Check if player win
                 if (monster.HealthPoints <= 0) 
                 {
                     winner = true;
+                    var expPoints = i * 2;
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"{player.Name} winner!");
+                    Console.WriteLine($"{player.Name}-{player.CharClass} winner!");
+                    Console.WriteLine($"{player.CharClass} gets {expPoints} experience points");
                     Console.ResetColor();
 
                     // Update players Level
-                    player.ExpPoints += i * 30;
+                    player.ExpPoints += expPoints;
                     player.CheckLevelUp();
 
-                    //Get coins reward
+                    // Get coins reward
                     player.Coins += monster.Coins;
 
                     // Restored character's health point after fight
@@ -152,11 +160,14 @@ namespace RPGame
                     continue;
                 }
 
+                // Monster turn
                 player.HealthPoints -= monster.StrengthPoints;
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"The {monster.Name} hits the {player.Name} and deals {monster.StrengthPoints} damage!");
+                Console.WriteLine($"The {monster.Name} hits the {player.Name}-{player.CharClass} and deals {monster.StrengthPoints} damage!");
                 Console.ResetColor();
-                Console.WriteLine($"Player HP is {player.HealthPoints}");
+                Console.WriteLine($"Player health: {player.HealthPoints}");
+                
+                // Check if monster win
                 if (player.HealthPoints <= 0)
                 {
                     winner = true;
@@ -166,12 +177,13 @@ namespace RPGame
                     continue;
                 }
 
+                // Access to health potions
+                Console.WriteLine();
                 Console.Write("Press any key to next round or press 'h' to use health potion: ");
                 if (Console.ReadKey().Key == ConsoleKey.H)
                 {
                     player.UseHealthPotion();
                 }
-                Console.WriteLine();
             }
         }
 
@@ -179,16 +191,18 @@ namespace RPGame
         {
             // Здесь вы можете реализовать магазин, где игрок может покупать предметы, оружие и броню.
             Console.Clear();
-            Console.WriteLine("Welcome to the shop!");
+            Console.WriteLine("Welcome to the game shop!");
+            Shop shop = new Shop();
+
         }
 
         static void DisplayInventory(Player player)
         {
-            // Здесь вы можете отобразить инвентарь игрока, его текущее здоровье, атаку, золото и другие параметры.
+            // Show player's inventory with different parameters.
             Console.WriteLine();
             Console.WriteLine("---------------------------------------------");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"{player.Name}-{player.CharClass} inventory:");
+            Console.WriteLine($"{player.Name} - {player.CharClass} inventory:");
             Console.WriteLine($"{player.CharClass} level is: {player.Level}");
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine($"Attack power: {player.StrengthPoints}");
