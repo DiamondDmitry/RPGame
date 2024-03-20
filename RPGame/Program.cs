@@ -14,18 +14,17 @@ namespace RPGame
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.Unicode;
             Console.WriteLine("Welcome to the console RPG!");
-            // Create new player
 
+            // Create new player
             //Console.WriteLine("Create new character.");
             //Console.Write("Enter your name: ");
             //string name = Console.ReadLine();
             string name = "Jedi";
-
             Player player = Player.CreatePlayer(name);
 
             while (true)
             {
-                if (player.HealthPoints > 0)
+                if (player.HealthPoints > 0 && player.Level < player.MaxLevel)
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine("\nMain menu:");
@@ -65,12 +64,21 @@ namespace RPGame
                 }
                 else
                 {
-                    Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"{player.CharClass} is dead");
-                    Console.ResetColor();
+                    if (player.Level >= player.MaxLevel)
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"The {player.Name} - {player.CharClass} defeated all monsters and became the absolute winner, reaching {player.MaxLevel} level!");
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"The {player.Name} - {player.CharClass} fought bravely, but there were too many monsters!");
+                    }
+
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("\nStart next game?");
+                    Console.WriteLine("\nStart new game?");
                     Console.WriteLine("1. Yes");
                     Console.WriteLine("0. No");
                     Console.ResetColor();
@@ -80,8 +88,7 @@ namespace RPGame
                     switch (choice)
                     {
                         case "1":
-                            // Start fight with monster
-                            // Create player if character is dead
+                            // Create new player after end game
                             Console.Clear();
                             Console.WriteLine("Create new character.");
                             player = Player.CreatePlayer(name);
@@ -131,7 +138,7 @@ namespace RPGame
                     Console.ResetColor();
 
                     // Update players Level
-                    player.ExpPoints += i * 10;
+                    player.ExpPoints += i * 30;
                     player.CheckLevelUp();
 
                     //Get coins reward
