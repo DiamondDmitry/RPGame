@@ -22,64 +22,92 @@ namespace RPGame
             string name = "Jedi";
 
             Player player = Player.CreatePlayer(name);
-            bool loose = false;
+
             while (true)
             {
-                if (loose)
+                if (player.HealthPoints > 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("\nMain menu:");
+                    Console.WriteLine("1. Fight with monster");
+                    Console.WriteLine("2. Go to the shop");
+                    Console.WriteLine("3. Inventory");
+                    Console.WriteLine("0. Exit");
+                    Console.ResetColor();
+                    Console.Write("Choose action: ");
+                    string choice = Console.ReadLine();
+
+                    switch (choice)
+                    {
+                        case "1":
+                            // Start fight with monster
+                            FightMonster(player);
+                            break;
+                        case "2":
+                            // Going to the shop
+                            VisitShop(player);
+                            break;
+                        case "3":
+                            // Show players inventory
+                            DisplayInventory(player);
+                            break;
+                        case "0":
+                            // Game exit
+                            Console.WriteLine("Thank you for the game. Goodbye!");
+                            Environment.Exit(0);
+                            break;
+                        default:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("\nChoose from Menu!");
+                            Console.ResetColor();
+                            break;
+                    }
+                }
+                else
                 {
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"{player.CharClass} is dead");
                     Console.ResetColor();
-                    // Create player if character is dead
-                    Console.WriteLine("Create new character.");
-                    player = Player.CreatePlayer(name);
-                }
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("\nMain menu:");
-                Console.WriteLine("1. Fight with monster");
-                Console.WriteLine("2. Go to the shop");
-                Console.WriteLine("3. Inventory");
-                Console.WriteLine("0. Exit");
-                Console.ResetColor();
-                Console.Write("Choose action: ");
-                string choice = Console.ReadLine();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("\nStart next game?");
+                    Console.WriteLine("1. Yes");
+                    Console.WriteLine("0. No");
+                    Console.ResetColor();
+                    Console.Write("Choose action: ");
+                    string choice = Console.ReadLine();
 
-                switch (choice)
-                {
-                    case "1":
-                        // Start fight with monster
-                        loose = FightMonster(player);
-                        break;
-                    case "2":
-                        // Going to the shop
-                        VisitShop(player);
-                        break;
-                    case "3":
-                        // Show players inventory
-                        DisplayInventory(player);
-                        break;
-                    case "0":
-                        // Game exit
-                        Console.WriteLine("Thank you  for the game. Goodbye!");
-                        Environment.Exit(0);
-                        break;
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("\nChoose from Menu!");
-                        Console.ResetColor();
-                        break;
+                    switch (choice)
+                    {
+                        case "1":
+                            // Start fight with monster
+                            // Create player if character is dead
+                            Console.Clear();
+                            Console.WriteLine("Create new character.");
+                            player = Player.CreatePlayer(name);
+                            break;
+                        case "0":
+                            // Game exit
+                            Console.WriteLine("Thank you for the game. Goodbye!");
+                            Environment.Exit(0);
+                            break;
+                        default:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("\nChoose from Menu!");
+                            Console.ResetColor();
+                            break;
+                    }
                 }
             }
         }
-        static bool FightMonster(Player player)
+        static void FightMonster(Player player)
         {
             // Здесь вы можете реализовать механику боя с монстром
             // Создайте монстра, определите условия победы и поражения и обновите состояние игрока.
 
-            List<Monster> monsterList = Monster.CreateMonsterList(player);
-            Monster monster = Monster.SelectMonsterToFight(monsterList);
-            int startPlayerHealthPoints = player.HealthPoints;
+            List<Monster> packOfMonsters = Monster.GenerateMonsterPack(player);
+            Monster monster = Monster.Get5NearbyMonsters(packOfMonsters);
+            //int startPlayerHealthPoints = player.HealthPoints;
             Console.Clear();
             Console.WriteLine($"Monstr {monster.Name} is coming to fight you!");
             bool winner = false;
@@ -87,9 +115,13 @@ namespace RPGame
             while (!winner)
             {
                 i++;
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine($"\nRound {i}");
+                Console.ResetColor();
                 monster.HealthPoints -= player.StrengthPoints;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"The {player.Name} hits the {monster.Name} and deals {player.StrengthPoints} damage!");
+                Console.ResetColor();
                 Console.WriteLine($"Monster HP is {monster.HealthPoints}");
                 if (monster.HealthPoints <= 0) 
                 {
@@ -98,16 +130,25 @@ namespace RPGame
                     Console.WriteLine($"{player.Name} winner!");
                     Console.ResetColor();
 
-                    // Update players stats
+                    // Update players Level
                     player.ExpPoints += i * 10;
                     player.CheckLevelUp();
+
+                    //Get coins reward
                     player.Coins += monster.Coins;
+
+                    // Restored character's health point after fight
                     player.HealthPoints = player.MaxHealthPoints;
+
+                    DisplayInventory(player);
+
                     continue;
                 }
 
                 player.HealthPoints -= monster.StrengthPoints;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"The {monster.Name} hits the {player.Name} and deals {monster.StrengthPoints} damage!");
+                Console.ResetColor();
                 Console.WriteLine($"Player HP is {player.HealthPoints}");
                 if (player.HealthPoints <= 0)
                 {
@@ -125,39 +166,7 @@ namespace RPGame
                 }
                 Console.WriteLine();
             }
-
-            if (player.HealthPoints <= 0)
-            {
-                // If character is dead
-                return true;
-            }
-            else
-            {
-                // Restored character's health point
-                player.HealthPoints = player.MaxHealthPoints;
-                return false;
-            }
         }
-
-        //private static void UseHealthPotion1(Player player)
-        //{
-        //    if (player.NumberOfHealthPotions <= 0)
-        //    {
-        //        Console.ForegroundColor = ConsoleColor.Red;
-        //        Console.WriteLine("You don't have Health Potions");
-        //        Console.ResetColor();
-        //    }
-        //    else
-        //    {
-        //        player.NumberOfHealthPotions--;
-        //        player.HealthPoints = player.MaxHealthPoints;
-        //        Console.ForegroundColor = ConsoleColor.Green;
-        //        Console.WriteLine("Health restored!");
-        //        Console.ResetColor();
-        //        //Console.WriteLine("Press any key to continue the battle");
-        //        //Console.ReadKey();
-        //    }
-        //}
 
         static void VisitShop(Player player)
         {
@@ -169,7 +178,8 @@ namespace RPGame
         static void DisplayInventory(Player player)
         {
             // Здесь вы можете отобразить инвентарь игрока, его текущее здоровье, атаку, золото и другие параметры.
-            Console.Clear();
+            Console.WriteLine();
+            Console.WriteLine("---------------------------------------------");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"{player.Name}-{player.CharClass} inventory:");
             Console.WriteLine($"{player.CharClass} level is: {player.Level}");
@@ -177,13 +187,16 @@ namespace RPGame
             Console.WriteLine($"Attack power: {player.StrengthPoints}");
             Console.WriteLine($"Defence points: {player.DefencePoints}");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Number of health potions: {player.NumberOfHealthPotions}");
+            Console.WriteLine($"Health points: {player.HealthPoints}");
+            Console.WriteLine($"Number of health potions: {player.Invenory.NumberOfHealthPotions}");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"Amount of Gold: {player.Coins}");
             Console.ResetColor();
+            Console.WriteLine("---------------------------------------------");
 
-            Console.WriteLine("Press any key to main menu");
+            Console.Write("Press any key to main menu ");
             Console.ReadKey();
+            Console.WriteLine();
         }
     }
 }

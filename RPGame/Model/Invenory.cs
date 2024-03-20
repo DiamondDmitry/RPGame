@@ -11,12 +11,5 @@ namespace RPGame.Model
         public string ArmorSlot { get; set; }
         public string WeaponSlot { get; set; }
         public int NumberOfHealthPotions { get; set; } = 3;
-
-        //public static Invenory CreateInventory() 
-        //{
-        //    Invenory invenory = new Invenory();
-        //    return invenory;
-        //}
-
     }
 }

@@ -5,15 +5,11 @@ namespace RPGame.Model.Characters
     public class Player : Character
     {
         public string CharClass { get; set; }
-        public int Level { get; set; } = 1;
         public int ExpPoints { get; set; }
         public int ExpToLevelUp { get; set; } = 25;
-        public const byte MaxLevel = 10;
-        public int NumberOfHealthPotions { get; set; } = 3;
-        public int ArmorSlot { get; set; }
-        public int WeaponSlot { get; set; }
-
-        public Player(string name, string charClass, int healthPoints, int maxHealthPoints, int strengthPoints, int agilityPoints)
+        public byte MaxLevel { get; set; } = 10;
+        public Invenory Invenory { get; set; }
+        public Player(string name, string charClass, int healthPoints, int maxHealthPoints, int strengthPoints, int agilityPoints, Invenory invenory)
         {
             Name = name;
             HealthPoints = healthPoints;
@@ -21,6 +17,7 @@ namespace RPGame.Model.Characters
             AgilityPoints = agilityPoints;
             CharClass = charClass;
             MaxHealthPoints = maxHealthPoints;
+            Invenory = invenory;
         }
 
         public static string[] charClassName = new string[4]
@@ -59,14 +56,14 @@ namespace RPGame.Model.Characters
                         charClass = charClassName[0];
                         healthPoints = 140;
                         maxHealthPoints = 140;
-                        strengthPoints = 25;
+                        strengthPoints = 30;
                         agilityPoints = 0;
                         break;
                     case "2":
                         charClass = charClassName[1];
                         healthPoints = 120;
                         maxHealthPoints = 120;
-                        strengthPoints = 20;
+                        strengthPoints = 24;
                         agilityPoints = 2;
                         break;
                     case "3":
@@ -74,14 +71,14 @@ namespace RPGame.Model.Characters
                         healthPoints = 80;
                         maxHealthPoints = 80;
                         strengthPoints = 30;
-                        agilityPoints = 5;
+                        agilityPoints = 4;
                         break;
                     case "4":
                         charClass = charClassName[3];
                         healthPoints = 100;
                         maxHealthPoints = 100;
-                        strengthPoints = 15;
-                        agilityPoints = 8;
+                        strengthPoints = 20;
+                        agilityPoints = 5;
                         break;
 
                     default:
@@ -90,13 +87,8 @@ namespace RPGame.Model.Characters
                 }
             }
             Console.WriteLine($"You selected {charClass}!");
-            Player player = new Player(name, charClass, healthPoints, maxHealthPoints, strengthPoints, agilityPoints);
-            return player;
-        }
-
-        // Увеличение уровня
-        public static Player LevelUp(Player player)
-        {
+            Invenory invenory = new Invenory();
+            Player player = new Player(name, charClass, healthPoints, maxHealthPoints, strengthPoints, agilityPoints, invenory);
             return player;
         }
     }

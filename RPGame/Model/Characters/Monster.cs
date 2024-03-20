@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace RPGame.Model.Characters
 {
     public class Monster : Character
     {
-        public Monster(string name, int healthPoints, int strengthPoints, int agilityPoints, int coins)
+        public Monster(int level, int healthPoints, int strengthPoints, int agilityPoints, int coins)
         {
-            Name = name;
+            Random random = new Random();
+            Name = monsterNames[random.Next(monsterNames.Count)];
+            Level = level;
             HealthPoints = healthPoints;
             StrengthPoints = strengthPoints;
             AgilityPoints = agilityPoints;
@@ -18,57 +21,97 @@ namespace RPGame.Model.Characters
             {
                 "Goblin",
                 "Orc",
+                "Skeleton",
+                "Zombie",
+                "Dragon",
+                "Giant",
+                "Troll",
+                "Minotaur",
+                "Hydra",
+                "Griffin",
+                "Harpy",
+                "Cyclops",
+                "Chimera",
+                "Golem",
+                "Lich",
+                "Vampire",
+                "Werewolf",
+                "Ghost",
+                "Medusa",
+                "Manticore",
+                "Phoenix",
+                "Treant",
+                "Siren",
+                "Basilisk",
+                "Naga",
                 "Gargoyle",
                 "Centaur",
                 "Ogre",
-                "Cyclops",
-                "Behemoth",
-                "Dragon",
-                "Hydra",
-                "Griffin",
-                "Minotaur",
-                "Harpy",
-                "Medusa",
                 "Black Knight",
-                "Bone Dragon",
+                "Bone Dragon"
             };
 
-        public static List<Monster> CreateMonsterList(Player player)
+        public static List<Monster> GenerateMonsterPack(Player player)
         {
             Random random = new Random();
-            List<Monster> monsterList = new List<Monster>();
+            List<Monster> packOfMonsters = new List<Monster>();
+
+            while(packOfMonsters.Count < 15)
+            {
+                int level = player.Level + packOfMonsters.Count/5;
+                if (level > player.MaxLevel) level = player.MaxLevel;
+
+                int healthPoints = random.Next((player.HealthPoints / player.Level) * level, (player.HealthPoints / player.Level) * level * 2);
+                int strengthPoints = random.Next((player.StrengthPoints / player.Level) / 2 * level, (player.StrengthPoints / player.Level) * level);
+                int agilityPoints = random.Next(1, 4);
+                int coins = level * random.Next(50, 200);
+
+                Monster monster = new Monster(level, healthPoints, strengthPoints, agilityPoints, coins);
+                packOfMonsters.Add(monster);
+            }
+
+            return packOfMonsters;
+        }
+
+        public static Monster Get5NearbyMonsters(List<Monster> packOfMonsters)
+        {
+            Random random = new Random();
+            List<Monster> nearbyMonsters = new List<Monster>();
 
             for (int i = 0; i < 5; i++)
             {
-                string name = monsterNames[random.Next(monsterNames.Count)];
-                int healthPoints = random.Next(player.HealthPoints, player.HealthPoints * 2);
-                int strengthPoints = random.Next(player.StrengthPoints / 2, player.StrengthPoints);
-                int agilityPoints = random.Next(1, 3);
-                int coins = player.Level * random.Next(50, 200);
-                Monster monster = new Monster(name, healthPoints, strengthPoints, agilityPoints, coins);
-                monsterList.Add(monster);
+                int rnd = random.Next(packOfMonsters.Count);
+                nearbyMonsters.Add(packOfMonsters[rnd]);
+                packOfMonsters.RemoveAt(rnd);
             }
-
-            return monsterList;
-        }
-
-        public static Monster SelectMonsterToFight(List<Monster> monsterList)
-        {
-            byte i = 0;
+            
+            int n = 0;
             Console.WriteLine("Select number of monster to fight:");
-            foreach (Monster monster in monsterList)
+            foreach (Monster monster in nearbyMonsters)
             {
-                i++;
-                Console.Write($"{i}. {monster.Name} | ");
+                n++;
+                Console.Write($"{n}. {monster.Name} | ");
+                Console.Write($"Level: {monster.Level} | ");
                 Console.Write($"Health: {monster.HealthPoints} | ");
                 Console.Write($"Power: {monster.StrengthPoints} | ");
                 Console.Write($"Agility: {monster.AgilityPoints} | ");
                 Console.WriteLine($"Reward: {monster.Coins}");
             }
+
             byte.TryParse(Console.ReadLine(), out byte monsterNumber);
 
-            return monsterList[monsterNumber - 1];
-
+            try
+            {
+                return nearbyMonsters[monsterNumber - 1];
+            }
+            catch (Exception)
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.Write("Incorrect choice, you were attacked by a random monster.");
+                Console.ResetColor();
+                Console.ReadKey();
+                return packOfMonsters[random.Next(packOfMonsters.Count)];
+            }
         }
     }
 }
