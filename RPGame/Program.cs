@@ -3,7 +3,7 @@ using RPGame.Model;
 using System.Numerics;
 using System.Threading;
 using RPGame.Model.Characters;
-using RPGame.Helpers;
+using RPGame_Helpers;
 using RPGame.Items;
 
 namespace RPGame
@@ -17,10 +17,10 @@ namespace RPGame
             Console.WriteLine("Welcome to the console RPG!");
 
             // Create new player
-            Console.WriteLine("Create new character.");
-            Console.Write("Enter your name: ");
-            string name = Console.ReadLine();
-            //string name = "Jedi";
+            //Console.WriteLine("Create new character.");
+            //Console.Write("Enter your name: ");
+            //string name = Console.ReadLine();
+            string name = "Jedi";
             Player player = Player.CreatePlayer(name);
 
             while (true)
@@ -53,13 +53,11 @@ namespace RPGame
                             break;
                         case "0":
                             // Game exit
-                            Console.WriteLine("Thank you for the game. Goodbye!");
+                            Helpers.ColorWriteLine("Thank you for the game. Goodbye!", ConsoleColor.Blue);
                             Environment.Exit(0);
                             break;
                         default:
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("\nChoose from Menu!");
-                            Console.ResetColor();
+                            Helpers.ColorWriteLine("\nChoose from Menu!", ConsoleColor.Yellow);
                             break;
                     }
                 }
@@ -68,14 +66,12 @@ namespace RPGame
                     if (player.Level >= player.MaxLevel)
                     {
                         Console.Clear();
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"The {player.Name}-{player.CharClass} defeated all monsters and became the absolute winner, reaching {player.MaxLevel} level!");
+                        Helpers.ColorWriteLine($"The {player.Name}-{player.CharClass} defeated all monsters and became the absolute winner, reaching {player.MaxLevel} level!", ConsoleColor.Green);
                     }
                     else
                     {
                         Console.Clear();
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"The {player.Name}-{player.CharClass} fought bravely, but there were too many monsters!");
+                        Helpers.ColorWriteLine($"The {player.Name}-{player.CharClass} fought bravely, but there were too many monsters!", ConsoleColor.Red);
                     }
 
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -96,13 +92,11 @@ namespace RPGame
                             break;
                         case "0":
                             // Game exit
-                            Console.WriteLine("Thank you for the game. Goodbye!");
+                            Helpers.ColorWriteLine("Thank you for the game. Goodbye!", ConsoleColor.Blue);
                             Environment.Exit(0);
                             break;
                         default:
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("\nChoose from Menu!");
-                            Console.ResetColor();
+                            Helpers.ColorWriteLine("\nChoose from Menu!", ConsoleColor.Yellow);
                             break;
                     }
                 }
@@ -115,24 +109,18 @@ namespace RPGame
 
             Console.Clear();
             Console.Write("Monster ");
-            Console.ForegroundColor= ConsoleColor.Red;
-            Console.Write(monster.Name);
-            Console.ResetColor();
+            Helpers.ColorWrite(monster.Name, ConsoleColor.Red);
             Console.WriteLine(" is coming to fight you!");
             bool winner = false;
             int i = 0;
             while (!winner)
             {
                 i++;
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"\nRound {i}");
-                Console.ResetColor();
+                Helpers.ColorWriteLine($"\nRound {i}", ConsoleColor.Cyan);
                 
                 // Player turn
                 monster.HealthPoints -= player.StrengthPoints;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"The {player.Name}-{player.CharClass} hits the {monster.Name} and deals {player.StrengthPoints} damage!");
-                Console.ResetColor();
+                Helpers.ColorWriteLine($"The {player.Name}-{player.CharClass} hits the {monster.Name} and deals {player.StrengthPoints} damage!", ConsoleColor.Yellow);
                 Console.WriteLine($"Monster health: {monster.HealthPoints}");
                 
                 // Check if player win
@@ -140,14 +128,12 @@ namespace RPGame
                 {
                     winner = true;
                     var expPoints = i * 2;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"{player.Name}-{player.CharClass} winner!");
-                    Console.WriteLine($"{player.CharClass} gets {expPoints} experience points");
-                    Console.ResetColor();
+                    Helpers.ColorWriteLine($"{player.Name}-{player.CharClass} winner!", ConsoleColor.Green);
+                    Helpers.ColorWriteLine($"{player.CharClass} gets {expPoints} experience points", ConsoleColor.Green);
 
                     // Update players Level
                     player.ExpPoints += expPoints;
-                    player.CheckLevelUp();
+                    Player.CheckLevelUp(player);
 
                     // Get coins reward
                     player.Coins += monster.Coins;
@@ -162,18 +148,14 @@ namespace RPGame
 
                 // Monster turn
                 player.HealthPoints -= monster.StrengthPoints;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"The {monster.Name} hits the {player.Name}-{player.CharClass} and deals {monster.StrengthPoints} damage!");
-                Console.ResetColor();
+                Helpers.ColorWriteLine($"The {monster.Name} hits the {player.Name}-{player.CharClass} and deals {monster.StrengthPoints} damage!", ConsoleColor.Yellow);
                 Console.WriteLine($"Player health: {player.HealthPoints}");
                 
                 // Check if monster win
                 if (player.HealthPoints <= 0)
                 {
                     winner = true;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Monster {monster.Name} winner!");
-                    Console.ResetColor();
+                    Helpers.ColorWriteLine($"Monster {monster.Name} winner!", ConsoleColor.Red);
                     continue;
                 }
 
@@ -182,7 +164,7 @@ namespace RPGame
                 Console.Write("Press any key to next round or press 'h' to use health potion: ");
                 if (Console.ReadKey().Key == ConsoleKey.H)
                 {
-                    player.UseHealthPotion();
+                    Player.UseHealthPotion(player);
                 }
             }
         }
@@ -201,18 +183,14 @@ namespace RPGame
             // Show player's inventory with different parameters.
             Console.WriteLine();
             Console.WriteLine("---------------------------------------------");
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"{player.Name} - {player.CharClass} inventory:");
-            Console.WriteLine($"{player.CharClass} level is: {player.Level}");
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine($"Attack power: {player.StrengthPoints}");
-            Console.WriteLine($"Defence points: {player.DefencePoints}");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Health points: {player.HealthPoints}");
-            Console.WriteLine($"Number of health potions: {player.Invenory.NumberOfHealthPotions}");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"Amount of Gold: {player.Coins}");
-            Console.ResetColor();
+            Helpers.ColorWriteLine($"{player.Name} - {player.CharClass} inventory:", ConsoleColor.Cyan);
+            Helpers.ColorWriteLine($"{player.CharClass} level is: {player.Level}", ConsoleColor.DarkYellow);
+            Helpers.ColorWriteLine($"Experience to next level: {player.ExpToLevelUp-player.ExpPoints}", ConsoleColor.Cyan);
+            Helpers.ColorWriteLine($"Attack power: {player.StrengthPoints}", ConsoleColor.Yellow);
+            Helpers.ColorWriteLine($"Defence points: {player.DefencePoints}", ConsoleColor.Blue);
+            Helpers.ColorWriteLine($"Health points: {player.HealthPoints}", ConsoleColor.Magenta);
+            Helpers.ColorWriteLine($"Number of health potions: {player.Invenory.NumberOfHealthPotions}", ConsoleColor.Green);
+            Helpers.ColorWriteLine($"Amount of Gold: {player.Coins}", ConsoleColor.Yellow);
             Console.WriteLine("---------------------------------------------");
 
             Console.Write("Press any key to main menu ");

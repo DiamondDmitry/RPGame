@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RPGame_Helpers;
+using System;
 using System.Xml.Linq;
 namespace RPGame.Model.Characters
 {
@@ -39,15 +40,13 @@ namespace RPGame.Model.Characters
             while (charClass == "empty")
             {
                 Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("List of characters: ");
+                Helpers.ColorWriteLine("List of characters: ", ConsoleColor.Cyan);
                 byte i = 0;
                 foreach (var className in charClassName)
                 {
                     i++;
-                    Console.WriteLine($"{i}. {className}");
+                    Helpers.ColorWriteLine($"{i}. {className}", ConsoleColor.Yellow);
                 }
-                Console.ResetColor();
                 Console.WriteLine();
                 Console.Write($"{name} select your character number: ");
                 string charClassNumber = Console.ReadLine();
@@ -89,12 +88,39 @@ namespace RPGame.Model.Characters
                 }
             }
             Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"You selected {charClass}, great choise!");
-            Console.ResetColor();
+            Helpers.ColorWriteLine($"You selected {charClass}, great choise!", ConsoleColor.Green);
             Invenory invenory = new Invenory();
             Player player = new Player(name, charClass, healthPoints, maxHealthPoints, strengthPoints, agilityPoints, invenory);
             return player;
         }
+
+        public static void UseHealthPotion(Player player)
+        {
+            Console.WriteLine();
+            if (player.Invenory.NumberOfHealthPotions > 0)
+            {
+                player.Invenory.NumberOfHealthPotions--;
+                player.HealthPoints = player.MaxHealthPoints;
+                Helpers.ColorWriteLine("Health restored!", ConsoleColor.Green);
+            }
+            else
+            {
+                Helpers.ColorWriteLine("You don't have Health Potions", ConsoleColor.Red);
+            }
+        }
+
+        public static void CheckLevelUp(Player player)
+        {
+            while (player.ExpPoints >= player.ExpToLevelUp && player.Level < player.MaxLevel)
+            {
+                player.ExpPoints -= player.ExpToLevelUp;
+                player.Level++;
+                Helpers.ColorWriteLine($"Level {player.CharClass} is UP!", ConsoleColor.Green);
+                Helpers.ColorWriteLine($"Current level is: {player.Level}", ConsoleColor.Green);
+            }
+            player.MaxHealthPoints *= player.Level;
+            player.StrengthPoints *= player.Level;
+        }
+
     }
 }

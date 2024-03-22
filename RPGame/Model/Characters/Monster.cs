@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RPGame_Helpers;
+using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
@@ -86,8 +87,9 @@ namespace RPGame.Model.Characters
             }
             
             int n = 0;
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Select number of monster to fight:");
+            Console.WriteLine();
+            Helpers.ColorWriteLine("Select number of monster to fight:", ConsoleColor.Cyan);
+            Console.ForegroundColor = ConsoleColor.Yellow;
             foreach (Monster monster in nearbyMonsters)
             {
                 n++;
@@ -107,9 +109,7 @@ namespace RPGame.Model.Characters
             }
             catch (Exception)
             {
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.Write("Incorrect choice, you were attacked by a random monster.");
-                Console.ResetColor();
+                Helpers.ColorWriteLine("Incorrect choice, you were attacked by a random monster.", ConsoleColor.Magenta);
                 Console.ReadKey();
                 return packOfMonsters[random.Next(packOfMonsters.Count)];
             }

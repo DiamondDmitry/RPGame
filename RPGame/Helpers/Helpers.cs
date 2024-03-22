@@ -5,46 +5,24 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using RPGame.Model.Characters;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace RPGame.Helpers
+namespace RPGame_Helpers
 {
     public static class Helpers
     {
-        public static Player UseHealthPotion(this Player player)
+        public static void ColorWriteLine(string text, ConsoleColor consoleColor)
         {
-            Console.WriteLine();
-            if (player.Invenory.NumberOfHealthPotions <= 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("You don't have Health Potions");
-                Console.ResetColor();
-            }
-            else
-            {
-                player.Invenory.NumberOfHealthPotions--;
-                player.HealthPoints = player.MaxHealthPoints;
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Health restored!");
-                Console.ResetColor();
-                //Console.WriteLine("Press any key to continue the battle");
-                //Console.ReadKey();
-            }
-            return player;
+            Console.ForegroundColor = consoleColor;
+            Console.WriteLine(text);
+            Console.ResetColor();
         }
-        public static Player CheckLevelUp(this Player player)
+
+        public static void ColorWrite(string text, ConsoleColor consoleColor)
         {
-            while (player.ExpPoints >= player.ExpToLevelUp && player.Level < player.MaxLevel) 
-            {
-                player.ExpPoints -= player.ExpToLevelUp;
-                player.Level++;
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Level {player.CharClass} is UP!");
-                Console.WriteLine($"Current level is: {player.Level}");
-                Console.ResetColor();
-            }
-            player.MaxHealthPoints *= player.Level;
-            player.StrengthPoints *= player.Level;
-            return player;
+            Console.ForegroundColor = consoleColor;
+            Console.Write(text);
+            Console.ResetColor();
         }
     }
 }
