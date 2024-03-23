@@ -5,6 +5,8 @@ using System.Threading;
 using RPGame.Model.Characters;
 using RPGame_Helpers;
 using RPGame.Items;
+using static System.Net.Mime.MediaTypeNames;
+using System.Reflection.Emit;
 
 namespace RPGame
 {
@@ -112,7 +114,7 @@ namespace RPGame
 
             Console.Clear();
             Console.Write("Monster ");
-            Helpers.ColorWrite(monster.Name, ConsoleColor.Red);
+            Helpers.ColorWrite($"{monster.Name} - level {monster.Level}", ConsoleColor.Red);
             Console.WriteLine(" is coming to fight you!");
             bool winner = false;
             int i = 0;
@@ -124,13 +126,15 @@ namespace RPGame
                 // Player turn
                 monster.HealthPoints -= player.StrengthPoints;
                 Helpers.ColorWriteLine($"The {player.Name}-{player.CharClass} hits the {monster.Name} and deals {player.StrengthPoints} damage!", ConsoleColor.Yellow);
+                if (monster.HealthPoints < 0) monster.HealthPoints = 0;
                 Console.WriteLine($"Monster health left: {monster.HealthPoints}");
                 
                 // Check if player win
                 if (monster.HealthPoints <= 0) 
                 {
                     winner = true;
-                    var expPoints = i * (monster.Level - player.Level + 1) * 2;
+                    var expPoints = i * (monster.Level - player.Level + 1);
+                    Console.Clear();
                     Helpers.ColorWriteLine($"{player.Name}-{player.CharClass} winner!", ConsoleColor.Green);
                     Helpers.ColorWriteLine($"{player.CharClass} gets {expPoints} experience points", ConsoleColor.Green);
 
@@ -150,15 +154,26 @@ namespace RPGame
                 }
 
                 // Monster turn
-                player.HealthPoints -= monster.StrengthPoints;
-                Helpers.ColorWriteLine($"The {monster.Name} hits the {player.Name}-{player.CharClass} and deals {monster.StrengthPoints} damage!", ConsoleColor.Yellow);
+                int blockedDamage = 0;
+                if (player.Invenory.ArmorSlot != null)
+                {
+                    blockedDamage = player.Invenory.ArmorSlot.DefencePoints;
+                    player.HealthPoints -= monster.StrengthPoints;
+                    player.HealthPoints += blockedDamage;
+                }
+                else
+                {
+                    player.HealthPoints -= monster.StrengthPoints;
+                }
+                Helpers.ColorWriteLine($"\nThe {monster.Name} hits the {player.Name}-{player.CharClass} and deals {monster.StrengthPoints} damage!", ConsoleColor.Yellow);
+                Helpers.ColorWriteLine($"{player.Name}-{player.CharClass} blocked {blockedDamage} points of damage", ConsoleColor.Blue);
                 Console.WriteLine($"Player health left: {player.HealthPoints}");
                 
                 // Check if monster win
                 if (player.HealthPoints <= 0)
                 {
                     winner = true;
-                    Helpers.ColorWriteLine($"Monster {monster.Name} winner!", ConsoleColor.Red);
+                    Helpers.ColorWriteLine($"Monster {monster.Name}-level {monster.Level} winner!", ConsoleColor.Red);
                     continue;
                 }
 
@@ -177,16 +192,16 @@ namespace RPGame
             // Create shop with game items, like weapons, armor, health potions etc..
             List<Armor> armorList = Armor.GetArmorList(player);
             List<Weapon> weaponList = Weapon.GetWeaponList(player);
-            Console.Clear();
             bool shoping = false;
             while (!shoping)
             {
+                Console.Clear();
                 Helpers.ColorWriteLine("Welcome to the game shop!", ConsoleColor.Cyan);
                 Helpers.ColorWriteLine($"You have {player.Coins} coins.", ConsoleColor .DarkYellow);
                 Helpers.ColorWriteLine("What would you like to buy?", ConsoleColor.Cyan);
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("1. List armors");
-                Console.WriteLine("2. List weapons");
+                Console.WriteLine("1. List weapons");
+                Console.WriteLine("2. List armors");
                 Console.WriteLine("3. Buy health potion for 100 coins");
                 Console.WriteLine("0. Exit");
                 Console.ResetColor();
@@ -196,20 +211,30 @@ namespace RPGame
                 switch (choice)
                 {
                     case "1":
-                        Armor.BuyArmor(player, armorList);
-                        break;
-                    case "2":
                         Weapon.BuyWeapon(player, weaponList);
                         break;
+                    case "2":
+                        Armor.BuyArmor(player, armorList);
+                        break;
                     case "3":
-                        player.Invenory.NumberOfHealthPotions++;
+                        if (player.Coins >= 100)
+                        {
+                            player.Coins -= 100;
+                            player.Invenory.NumberOfHealthPotions++;
+                            Helpers.ColorWriteLine($"\nYou bought health potion, enjoy", ConsoleColor.Green);
+                            Console.WriteLine();
+                            break;
+                        }
+                        Helpers.ColorWriteLine("\nYou don't have enough money to buy potion!", ConsoleColor.DarkYellow);
+                        Console.WriteLine();
                         break;
                     case "0":
-                        Helpers.ColorWriteLine("Thank you for shoping!", ConsoleColor.Cyan);
+                        Helpers.ColorWriteLine("\nThank you for shoping!", ConsoleColor.Cyan);
                         shoping = true;
                         break;
                     default:
                         Helpers.ColorWriteLine("\nIncorrect select, choose from shop menu!", ConsoleColor.Yellow);
+                        Console.WriteLine();
                         break;
                 }
             }
@@ -221,7 +246,7 @@ namespace RPGame
 
             Console.WriteLine();
             Console.WriteLine("----------------------------------------------------------------------");
-            Helpers.ColorWriteLine($"{player.Name} - {player.CharClass} inventory:", ConsoleColor.Cyan);
+            Helpers.ColorWriteLine($"{player.Name}-{player.CharClass} inventory:", ConsoleColor.Cyan);
             Helpers.ColorWriteLine($"{player.CharClass} level is: {player.Level}", ConsoleColor.DarkYellow);
             Helpers.ColorWriteLine($"Experience to next level: {player.ExpToLevelUp-player.ExpPoints}", ConsoleColor.Cyan);
             Helpers.ColorWriteLine($"Attack power: {player.StrengthPoints}", ConsoleColor.Yellow);
@@ -231,20 +256,20 @@ namespace RPGame
             Helpers.ColorWriteLine($"Number of health potions: {player.Invenory.NumberOfHealthPotions}", ConsoleColor.Green);
             Helpers.ColorWriteLine($"Amount of Gold: {player.Coins}", ConsoleColor.DarkYellow);
             Console.WriteLine("----------------------------------------------------------------------");
-            if (player.Invenory.ArmorSlot != null)
-            {
-                Helpers.ColorWriteLine($"Armor slot: {player.Invenory.ArmorSlot.Name}, " +
-                                       $"Level: {player.Invenory.ArmorSlot.Level}, " +
-                                       $"Defence: {player.Invenory.ArmorSlot.DefencePoints}, " +
-                                       $"Agility: {player.Invenory.ArmorSlot.AgilityPoints}", ConsoleColor.Yellow);
-                Console.WriteLine("----------------------------------------------------------------------");
-            }
             if (player.Invenory.WeaponSlot != null)
             {
                 Helpers.ColorWriteLine($"Weapon slot: {player.Invenory.WeaponSlot.Name}, " +
                                        $"Level: {player.Invenory.WeaponSlot.Level}, " +
                                        $"Attack: {player.Invenory.WeaponSlot.StrengthPoints}, " +
                                        $"Agility: {player.Invenory.WeaponSlot.AgilityPoints}", ConsoleColor.Yellow);
+                Console.WriteLine("----------------------------------------------------------------------");
+            }
+            if (player.Invenory.ArmorSlot != null)
+            {
+                Helpers.ColorWriteLine($"Armor slot: {player.Invenory.ArmorSlot.Name}, " +
+                                       $"Level: {player.Invenory.ArmorSlot.Level}, " +
+                                       $"Defence: {player.Invenory.ArmorSlot.DefencePoints}, " +
+                                       $"Agility: {player.Invenory.ArmorSlot.AgilityPoints}", ConsoleColor.Yellow);
                 Console.WriteLine("----------------------------------------------------------------------");
             }
 

@@ -8,7 +8,7 @@ namespace RPGame.Model.Characters
     {
         public string CharClass { get; set; }
         public int ExpPoints { get; set; }
-        public int ExpToLevelUp { get; set; } = 25;
+        public int ExpToLevelUp { get; set; } = 30;
         public byte MaxLevel { get; set; } = 10;
         public int BaseHealthPoints { get; set; } = 100;
         public int BaseStrengthPoints { get; set; } = 24;
@@ -100,7 +100,7 @@ namespace RPGame.Model.Characters
             {
                 player.Invenory.NumberOfHealthPotions--;
                 player.HealthPoints = player.MaxHealthPoints;
-                Helpers.ColorWriteLine("Health restored!", ConsoleColor.Green);
+                Helpers.ColorWriteLine($"Health restored to {player.MaxHealthPoints} health points!", ConsoleColor.Green);
             }
             else
             {

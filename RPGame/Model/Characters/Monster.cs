@@ -63,9 +63,9 @@ namespace RPGame.Model.Characters
                 if (level > player.MaxLevel) level = player.MaxLevel;
 
                 int healthPoints = random.Next(player.BaseHealthPoints * level * 2, player.BaseHealthPoints * level * 3);
-                int strengthPoints = random.Next((player.BaseStrengthPoints / 2) * level, player.BaseStrengthPoints * level);
+                int strengthPoints = random.Next((player.StrengthPoints / 2) * level, player.BaseStrengthPoints * level);
                 int agilityPoints = random.Next(1, 4);
-                int coins = level * random.Next(50, 100);
+                int coins = level * random.Next(50, 75);
 
                 Monster monster = new Monster(level, healthPoints, strengthPoints, agilityPoints, coins);
                 packOfMonsters.Add(monster);
@@ -93,7 +93,7 @@ namespace RPGame.Model.Characters
         {
             Random random = new Random();
             int n = 0;
-            Console.WriteLine();
+            Helpers.ColorWriteLine("\nList of nearby monsters:", ConsoleColor.DarkYellow);
             Console.ForegroundColor = ConsoleColor.Yellow;
             foreach (Monster monster in nearbyMonsters)
             {
@@ -107,7 +107,7 @@ namespace RPGame.Model.Characters
             }
             Console.ResetColor();
 
-            Helpers.ColorWriteLine("Select number of monster to fight:", ConsoleColor.Cyan);
+            Helpers.ColorWrite("Select number of monster to fight:", ConsoleColor.Cyan);
             byte.TryParse(Console.ReadLine(), out byte monsterNumber);
             try
             {

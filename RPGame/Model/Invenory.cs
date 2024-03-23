@@ -9,8 +9,8 @@ namespace RPGame.Model
 {
     public class Invenory
     {
-        public Armor ArmorSlot { get; set; }
         public Weapon WeaponSlot { get; set; }
+        public Armor ArmorSlot { get; set; }
         public int NumberOfHealthPotions { get; set; } = 3;
     }
 }

@@ -11,6 +11,6 @@ namespace RPGame.Model.Characters
         public int StrengthPoints { get; set; }
         public int DefencePoints { get; set; }
         public int AgilityPoints { get; set; }
-        public int Coins { get; set; } = 200;
+        public int Coins { get; set; } = 100;
     }
 }

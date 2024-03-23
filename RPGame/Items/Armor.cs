@@ -54,7 +54,7 @@ namespace RPGame.Items
             {
                 int level = player.Level + armorList.Count / 3;
                 int price = level * random.Next(75, 101);
-                int defencePoints = random.Next((player.BaseHealthPoints / 4) * level, (player.BaseHealthPoints / 3) * level);
+                int defencePoints = random.Next((player.BaseHealthPoints / 15) * level, (player.BaseHealthPoints / 13) * level);
                 int agilityPoints = random.Next(1, 3);
 
                 Armor armor = new Armor(level, price, defencePoints, agilityPoints);
@@ -69,7 +69,7 @@ namespace RPGame.Items
             while(!endShoping)
             {
                 int n = 0;
-                Helpers.ColorWriteLine("\nSelect armor to buy:", ConsoleColor.DarkYellow);
+                Helpers.ColorWriteLine("\nList of avaible armors:", ConsoleColor.DarkYellow);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 foreach (Armor armor in armorList)
                 {

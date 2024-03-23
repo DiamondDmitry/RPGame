@@ -67,7 +67,7 @@ namespace RPGame.Items
             while (!endShoping)
             {
                 int n = 0;
-                Helpers.ColorWriteLine("\nSelect weapons to buy:", ConsoleColor.DarkYellow);
+                Helpers.ColorWriteLine("\nList of avaible weapons:", ConsoleColor.DarkYellow);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 foreach (Weapon weapon in weaponList)
                 {
@@ -80,7 +80,7 @@ namespace RPGame.Items
                 }
                 Console.WriteLine("0. Exit to shop menu.");
                 Console.ResetColor();
-                Helpers.ColorWrite("Select number of Armor to buy: ", ConsoleColor.Cyan);
+                Helpers.ColorWrite("Select number of weapon to buy: ", ConsoleColor.Cyan);
                 if (byte.TryParse(Console.ReadLine(), out byte buyNumber))
                 {
                     if (buyNumber == 0)
