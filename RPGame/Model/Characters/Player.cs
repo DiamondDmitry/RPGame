@@ -1,4 +1,5 @@
-﻿using RPGame_Helpers;
+﻿using RPGame.Items;
+using RPGame_Helpers;
 using System;
 using System.Xml.Linq;
 namespace RPGame.Model.Characters
@@ -9,6 +10,8 @@ namespace RPGame.Model.Characters
         public int ExpPoints { get; set; }
         public int ExpToLevelUp { get; set; } = 25;
         public byte MaxLevel { get; set; } = 10;
+        public int BaseHealthPoints { get; set; } = 100;
+        public int BaseStrengthPoints { get; set; } = 24;
         public Invenory Invenory { get; set; }
         public Player(string name, string charClass, int healthPoints, int maxHealthPoints, int strengthPoints, int agilityPoints, Invenory invenory)
         {
@@ -55,42 +58,38 @@ namespace RPGame.Model.Characters
                 {
                     case "1":
                         charClass = charClassName[0];
-                        healthPoints = 140;
-                        maxHealthPoints = 140;
+                        maxHealthPoints = 120;
                         strengthPoints = 30;
                         agilityPoints = 0;
                         break;
                     case "2":
                         charClass = charClassName[1];
-                        healthPoints = 120;
-                        maxHealthPoints = 120;
+                        maxHealthPoints = 100;
                         strengthPoints = 24;
                         agilityPoints = 2;
                         break;
                     case "3":
                         charClass = charClassName[2];
-                        healthPoints = 80;
-                        maxHealthPoints = 80;
+                        maxHealthPoints = 75;
                         strengthPoints = 30;
                         agilityPoints = 4;
                         break;
                     case "4":
                         charClass = charClassName[3];
-                        healthPoints = 100;
-                        maxHealthPoints = 100;
+                        maxHealthPoints = 90;
                         strengthPoints = 20;
                         agilityPoints = 5;
                         break;
 
                     default:
-                        Console.WriteLine("Incorrect select, try again!");
+                        Helpers.ColorWriteLine("\nIncorrect select, choose from Menu!", ConsoleColor.Yellow);
                         break;
                 }
             }
             Console.WriteLine();
             Helpers.ColorWriteLine($"You selected {charClass}, great choise!", ConsoleColor.Green);
             Invenory invenory = new Invenory();
-            Player player = new Player(name, charClass, healthPoints, maxHealthPoints, strengthPoints, agilityPoints, invenory);
+            Player player = new Player(name, charClass, maxHealthPoints, maxHealthPoints, strengthPoints, agilityPoints, invenory);
             return player;
         }
 
@@ -111,6 +110,7 @@ namespace RPGame.Model.Characters
 
         public static void CheckLevelUp(Player player)
         {
+            int levelBeforeUpgrade = player.Level;
             while (player.ExpPoints >= player.ExpToLevelUp && player.Level < player.MaxLevel)
             {
                 player.ExpPoints -= player.ExpToLevelUp;
@@ -118,9 +118,19 @@ namespace RPGame.Model.Characters
                 Helpers.ColorWriteLine($"Level {player.CharClass} is UP!", ConsoleColor.Green);
                 Helpers.ColorWriteLine($"Current level is: {player.Level}", ConsoleColor.Green);
             }
-            player.MaxHealthPoints *= player.Level;
-            player.StrengthPoints *= player.Level;
-        }
+            player.MaxHealthPoints = (player.MaxHealthPoints / levelBeforeUpgrade) * player.Level;
 
+            //Checking the weapon slot before upgrading and removing additional power points.
+            if (player.Invenory.WeaponSlot != null)
+            {
+                player.StrengthPoints = ((player.StrengthPoints - player.Invenory.WeaponSlot.StrengthPoints) / levelBeforeUpgrade) * player.Level;
+                player.StrengthPoints += player.Invenory.WeaponSlot.StrengthPoints;
+            }
+            else
+            {
+                player.StrengthPoints = (player.StrengthPoints / levelBeforeUpgrade) * player.Level;
+            }
+
+        }
     }
 }

@@ -11,16 +11,16 @@ namespace RPGame_Helpers
 {
     public static class Helpers
     {
-        public static void ColorWriteLine(string text, ConsoleColor consoleColor)
+        public static void ColorWriteLine(string text, ConsoleColor color)
         {
-            Console.ForegroundColor = consoleColor;
+            Console.ForegroundColor = color;
             Console.WriteLine(text);
             Console.ResetColor();
         }
 
-        public static void ColorWrite(string text, ConsoleColor consoleColor)
+        public static void ColorWrite(string text, ConsoleColor color)
         {
-            Console.ForegroundColor = consoleColor;
+            Console.ForegroundColor = color;
             Console.Write(text);
             Console.ResetColor();
         }
